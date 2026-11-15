@@ -28,6 +28,7 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`. |
 | `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
 | `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
+| `lib/focusWatch.js`, `lib/accessibleExtents.js` | Where keyboard focus and the text cursor are (AT-SPI), gated so blocking lookups only run when needed. |
 | `lib/viewBadge.js`, `lib/zoomIndicator.js` | Feedback: the badge inside each view; the top-panel indicator. |
 | `lib/safety.js` | `safely` (cleanup steps) and `guard` (entry points). |
 | `lib/viewport.js`, `lib/monitorStates.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |

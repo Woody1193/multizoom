@@ -3,7 +3,7 @@
 // Tests for lib/viewport.js. Run all tests with `make test`.
 
 const V = imports.lib.viewport;
-const {eq} = imports.tests.harness;
+const {eq, ok} = imports.tests.harness;
 
 // Two side-by-side monitors: left 2560x1080, right 1920x1080.
 const left = {x: 0, y: 0, width: 2560, height: 1080};
@@ -15,31 +15,31 @@ eq(V.clampZoom(0.5), 1, 'clampZoom low');
 eq(V.clampZoom(99), 16, 'clampZoom high');
 eq(V.clampZoom(2.5), 2.5, 'clampZoom mid');
 
-// trackPointer: corners and centre map onto the monitor's own area only.
+// followPoint: corners and centre map onto the monitor's own area only.
 let s = V.newState(right, 2);
 
-V.trackPointer(s, right, right.x, right.y);
+V.followPoint(s, right, right.x, right.y);
 eq(s.viewX, right.x, 'pointer top-left → viewX');
 eq(s.viewY, right.y, 'pointer top-left → viewY');
-V.trackPointer(s, right, right.x + right.width, right.y + right.height);
+V.followPoint(s, right, right.x + right.width, right.y + right.height);
 eq(s.viewX, right.x + right.width / 2, 'pointer bottom-right → viewX');
 eq(s.viewY, right.y + right.height / 2, 'pointer bottom-right → viewY');
-V.trackPointer(s, right, right.x + right.width / 2, right.y + right.height / 2);
+V.followPoint(s, right, right.x + right.width / 2, right.y + right.height / 2);
 eq(s.viewX, right.x + right.width / 4, 'pointer centre → viewX');
 
 // The pointer's drawn position equals its real position relative to the monitor.
 const drawnX = (right.x + 700 - (right.x + 700 * 0.5)) * 2;
 
-V.trackPointer(s, right, right.x + 700, 0);
+V.followPoint(s, right, right.x + 700, 0);
 eq((right.x + 700 - s.viewX) * s.zoom, drawnX, 'proportional keeps cursor at same monitor position');
 
 // Pointer outside the monitor is clamped, never showing the neighbour.
-V.trackPointer(s, right, 0, 0);
+V.followPoint(s, right, 0, 0);
 eq(s.viewX, right.x, 'pointer left of monitor clamps');
 
 // zoom 1 → view is exactly the monitor.
 s = V.newState(left, 1);
-V.trackPointer(s, left, 1234, 567);
+V.followPoint(s, left, 1234, 567);
 eq(s.viewX, 0, 'zoom 1 viewX');
 eq(s.viewY, 0, 'zoom 1 viewY');
 
@@ -86,3 +86,14 @@ eq(s.viewX + 2560 / 4 / 2, 1000, 'zoomTo locked keeps centre x (ignores pointer)
 eq(s.viewY + 1080 / 4 / 2, 500, 'zoomTo locked keeps centre y');
 V.zoomTo(s, left, 99, {x: 0, y: 0});
 eq(s.zoom, 16, 'zoomTo clamps');
+
+// followsFocus
+{
+    const m = {x: 0, y: 0, width: 100, height: 100};
+    const st = V.newState(m, 2);
+
+    ok(V.followsFocus(st), 'zoomed, unlocked view follows focus');
+    st.locked = true;
+    ok(!V.followsFocus(st), 'locked view ignores focus');
+    ok(!V.followsFocus(V.newState(m, 1)), 'view at 1x ignores focus');
+}
