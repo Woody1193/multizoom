@@ -28,6 +28,7 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`. |
 | `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
 | `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
+| `lib/viewBadge.js`, `lib/zoomIndicator.js` | Feedback: the badge inside each view; the top-panel indicator. |
 | `lib/safety.js` | `safely` (cleanup steps) and `guard` (entry points). |
 | `lib/viewport.js`, `lib/monitorStates.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
 | `schemas/*.gschema.xml` | GSettings: shortcuts and preferences. |
@@ -107,7 +108,7 @@ These are enforced by review, and by lint wherever a tool can measure them. When
 
 ### Accessibility
 
-- Feedback must be visible on the zoomed screen. Draw indicators inside our own per-monitor view (not zoomed), not only through the shell OSD, which may be outside the visible area.
+- Feedback must be visible on the zoomed screen. Draw indicators inside our own per-monitor view (not zoomed), not only through the shell OSD or the top panel, which may be outside the visible area.
 - All shortcuts live in GSettings so users can rebind them. Defaults must not collide with GNOME's accessibility shortcuts (Super+Alt+8, =, −, S).
 - Never steal the built-in magnifier's escape hatch: enabling the built-in magnifier (Super+Alt+8) must switch MultiZoom off.
 
