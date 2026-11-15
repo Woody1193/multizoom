@@ -1,8 +1,8 @@
 'use strict';
 
-// Tests for lib/monitorIdentity.js. Run all tests with `make test`.
+// Tests for lib/monitors/monitorIdentity.js. Run all tests with `make test`.
 
-const {monitorId, idsByIndex, geometryKey} = imports.lib.monitorIdentity;
+const {monitorId, idsByIndex, geometryKey} = imports.lib.monitors.monitorIdentity;
 const {eq} = imports.tests.harness;
 
 // Specs as Mutter reported them on the development machine (2026-11-15).
