@@ -63,11 +63,16 @@ gsettings --schemadir ~/.local/share/gnome-shell/extensions/multizoom@woody1193.
 
 ## Install
 
-From a clone of this repository:
+MultiZoom is packaged for Ubuntu and Pop!_OS 22.04 (GNOME Shell 42). Add its apt repository once, and updates then arrive with your normal system updates:
 
 ```sh
-make install   # symlinks into ~/.local/share/gnome-shell/extensions and compiles the settings schema
+sudo curl -fsSLo /etc/apt/keyrings/multizoom.gpg https://woody1193.github.io/multizoom/multizoom.gpg
+echo "deb [signed-by=/etc/apt/keyrings/multizoom.gpg] https://woody1193.github.io/multizoom ./" \
+    | sudo tee /etc/apt/sources.list.d/multizoom.list
+sudo apt update && sudo apt install gnome-shell-extension-multizoom
 ```
+
+Each release's `.deb` and zip are also attached to its [GitHub release](https://github.com/Woody1193/multizoom/releases).
 
 Then restart GNOME Shell (on X11: Alt+F2, type `r`, Enter; on Wayland: log out and back in) and enable it:
 
@@ -75,7 +80,15 @@ Then restart GNOME Shell (on X11: Alt+F2, type `r`, Enter; on Wayland: log out a
 gnome-extensions enable multizoom@woody1193.github.io
 ```
 
-Press Super+Alt+Z to start zooming. `make uninstall` removes it.
+Press Super+Alt+Z to start zooming.
+
+### From a clone
+
+```sh
+make install   # symlinks into ~/.local/share/gnome-shell/extensions and compiles the settings schema
+```
+
+A copy in `~/.local/share/gnome-shell/extensions` takes priority over the package, so run `make uninstall` before switching to the package.
 
 ## Development
 

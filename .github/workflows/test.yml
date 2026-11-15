@@ -27,3 +27,22 @@ jobs:
 
       - name: Run unit tests
         run: make test
+
+  package:
+    # Build the .deb and install it the way users will, so a broken package
+    # or an unresolvable dependency fails the pull request.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gnome-shell libglib2.0-bin unzip
+
+      - name: Build package
+        run: make deb
+
+      - name: Install package
+        run: sudo apt-get install -y ./dist/*.deb
+
+      - name: Check installed files
+        run: test -f /usr/share/gnome-shell/extensions/multizoom@woody1193.github.io/schemas/gschemas.compiled
