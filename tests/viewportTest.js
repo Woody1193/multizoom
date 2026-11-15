@@ -110,15 +110,23 @@ eq(s.zoom, 16, 'zoomTo clamps');
     eq(st.viewY, 20, 'leaving right keeps following y');
 }
 
-// clampZoom rounds away floating-point drift. Zooming out multiplies by
-// 1 / 1.25, which isn't exact in binary: out, out, in, in from 2 used to
-// give 2.0000000000000009.
+// stepZoom: additive steps on a grid, so levels stay round percentages.
 {
-    const STEP = 1.25;
+    eq(V.stepZoom(2, 0.25, 1), 2.25, 'in from a grid level adds one step');
+    eq(V.stepZoom(2, 0.25, -1), 1.75, 'out from a grid level removes one step');
+    eq(V.stepZoom(3.0517578125, 0.25, 1), 3.25, 'off-grid level snaps up to the grid going in');
+    eq(V.stepZoom(3.0517578125, 0.25, -1), 3, 'off-grid level snaps down to the grid going out');
+    eq(V.stepZoom(1, 0.25, -1), 1, 'stops at the minimum');
+    eq(V.stepZoom(16, 0.25, 1), 16, 'stops at the maximum');
+}
+
+// clampZoom rounds away floating-point drift: 0.1 isn't exact in binary,
+// so three 0.1 steps from 2 gave 2.3000000000000003.
+{
     let z = 2;
 
-    for (const factor of [1 / STEP, 1 / STEP, STEP, STEP])
-        z = V.clampZoom(z * factor);
+    for (let i = 0; i < 3; i++)
+        z = V.stepZoom(z, 0.1, 1);
 
-    ok(z === 2, 'out, out, in, in returns exactly to 2');
+    ok(z === 2.3, 'three 0.1 steps from 2 give exactly 2.3');
 }

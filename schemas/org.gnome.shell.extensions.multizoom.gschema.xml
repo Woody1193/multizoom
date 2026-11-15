@@ -18,10 +18,10 @@
       <description>Written by MultiZoom when a monitor's zoom changes. Keys are monitor geometry, "x,y,widthxheight".</description>
     </key>
     <key name="zoom-step" type="d">
-      <range min="1.05" max="4.0"/>
-      <default>1.25</default>
+      <range min="0.05" max="4.0"/>
+      <default>0.25</default>
       <summary>Zoom step</summary>
-      <description>Factor each zoom-in or zoom-out shortcut multiplies or divides the zoom by.</description>
+      <description>Amount each zoom-in or zoom-out shortcut adds to or removes from the zoom level (0.25 = 25%). Levels stay on multiples of it.</description>
     </key>
     <key name="toggle-zoom" type="as">
       <default><![CDATA[['<Super><Alt>z']]]></default>
