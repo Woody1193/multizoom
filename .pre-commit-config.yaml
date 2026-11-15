@@ -1,0 +1,59 @@
+# Quality gates run on every commit. Install once with `pre-commit install`.
+# CI runs the same hooks (see .github/workflows/lint.yml), so bypassing them
+# locally only moves the failure to the pull request.
+default_install_hook_types: [pre-commit]
+fail_fast: false
+# Use the Node from .nvmrc (installed locally and by setup-node in CI) rather
+# than letting pre-commit download one; its downloader can pick pre-releases.
+default_language_version:
+  node: system
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-json
+      - id: check-yaml
+      - id: check-xml
+      - id: check-executables-have-shebangs
+      - id: detect-private-key
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.24.1
+    hooks:
+      - id: markdownlint-cli2
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        description: Lint JavaScript with zero warnings allowed (run `npm ci` first)
+        entry: npx --no-install eslint --max-warnings=0
+        language: system
+        files: \.(js|mjs)$
+
+      - id: gsettings-schemas
+        name: validate GSettings schemas
+        entry: glib-compile-schemas --strict --dry-run schemas
+        language: system
+        files: \.gschema\.xml$
+        pass_filenames: false
+
+      - id: unit-tests
+        name: unit tests (gjs)
+        entry: make test
+        language: system
+        files: \.js$
+        pass_filenames: false

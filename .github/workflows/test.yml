@@ -1,0 +1,29 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    # 22.04 ships GJS 1.72, the same engine GNOME Shell 42 runs.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install GJS
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gjs
+
+      - name: Show GJS version
+        run: gjs --version
+
+      - name: Run unit tests
+        run: make test
