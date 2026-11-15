@@ -1,0 +1,6 @@
+config:
+  # Prose is wrapped by the editor, not at a fixed column.
+  MD013: false
+ignores:
+  - node_modules/**
+  - dist/**

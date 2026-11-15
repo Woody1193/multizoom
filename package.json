@@ -1,0 +1,21 @@
+{
+  "name": "multizoom",
+  "private": true,
+  "description": "Per-monitor screen zoom for GNOME Shell",
+  "license": "Unlicense",
+  "repository": "github:Woody1193/multizoom",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint --max-warnings=0 .",
+    "lint:fix": "eslint --fix .",
+    "test": "make test"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@stylistic/eslint-plugin": "6.0.0",
+    "eslint": "10.15.0",
+    "globals": "17.14.0"
+  }
+}
