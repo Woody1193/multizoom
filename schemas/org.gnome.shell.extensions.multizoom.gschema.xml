@@ -12,9 +12,32 @@
       <summary>Starting zoom for a monitor</summary>
       <description>Zoom level a monitor gets the first time MultiZoom sees it.</description>
     </key>
+    <key name="zoom-step" type="d">
+      <range min="1.05" max="4.0"/>
+      <default>1.25</default>
+      <summary>Zoom step</summary>
+      <description>Factor each zoom-in or zoom-out shortcut multiplies or divides the zoom by.</description>
+    </key>
     <key name="toggle-zoom" type="as">
       <default><![CDATA[['<Super><Alt>z']]]></default>
       <summary>Turn zoom on or off</summary>
+    </key>
+    <key name="zoom-in" type="as">
+      <default><![CDATA[['<Super><Alt>Up']]]></default>
+      <summary>Zoom in on the monitor under the pointer</summary>
+    </key>
+    <key name="zoom-out" type="as">
+      <default><![CDATA[['<Super><Alt>Down']]]></default>
+      <summary>Zoom out on the monitor under the pointer</summary>
+    </key>
+    <key name="toggle-lock" type="as">
+      <default><![CDATA[['<Super><Alt>k']]]></default>
+      <summary>Lock or unlock the view on the monitor under the pointer</summary>
+      <description>A locked view stays where it is: it no longer follows the pointer, even when the pointer is on that monitor.</description>
+    </key>
+    <key name="unlock-all" type="as">
+      <default><![CDATA[['<Super><Alt><Shift>k']]]></default>
+      <summary>Unlock every monitor</summary>
     </key>
   </schema>
 </schemalist>

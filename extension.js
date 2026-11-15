@@ -1,20 +1,20 @@
 'use strict';
 /* exported init */
 
-const {Meta, Shell} = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Viewport = Me.imports.lib.viewport;
 const {BuiltinMagnifier} = Me.imports.lib.builtinMagnifier;
+const {Keybindings} = Me.imports.lib.keybindings;
 const {MonitorStates} = Me.imports.lib.monitorStates;
 const {ZoomSession} = Me.imports.lib.zoomSession;
 const {guard, safely} = Me.imports.lib.safety;
 
 const ACTIVE_KEY = 'active';
 const DEFAULT_ZOOM_KEY = 'default-zoom';
-const TOGGLE_ZOOM_KEY = 'toggle-zoom';
+const ZOOM_STEP_KEY = 'zoom-step';
 
 // Composition root: owns the settings, the keyboard shortcut and the
 // fail-safe, and switches zoom on and off. The zooming itself is ZoomSession.
@@ -29,9 +29,7 @@ class MultiZoom {
         this._states = new MonitorStates(m => Viewport.newState(m, zoom));
         this._builtin = new BuiltinMagnifier(guard(() => this._stop(), this._onError));
 
-        Main.wm.addKeybinding(TOGGLE_ZOOM_KEY, this._settings,
-            Meta.KeyBindingFlags.NONE, Shell.ActionMode.ALL,
-            guard(() => this._toggle(), this._onError));
+        this._keybindings = new Keybindings(this._settings, this._shortcutActions());
 
         // Start only if the user left zoom on (e.g. before the screen locked).
         if (this._settings.get_boolean(ACTIVE_KEY))
@@ -46,12 +44,28 @@ class MultiZoom {
         const keepZoomed = this._session !== null && Main.sessionMode.isLocked;
 
         safely(() => this._endSession());
-        safely(() => Main.wm.removeKeybinding(TOGGLE_ZOOM_KEY));
+        safely(() => this._keybindings.destroy());
         safely(() => this._builtin.release(keepZoomed));
 
+        this._keybindings = null;
         this._builtin = null;
         this._states = null;
         this._settings = null;
+    }
+
+    // Handlers for each shortcut, keyed by its settings key. Everything but
+    // on/off acts on a running session only.
+    _shortcutActions() {
+        const guarded = fn => guard(fn, this._onError);
+        const step = () => this._settings.get_double(ZOOM_STEP_KEY);
+
+        return {
+            'toggle-zoom': guarded(() => this._toggle()),
+            'zoom-in': guarded(() => this._session?.zoomBy(step())),
+            'zoom-out': guarded(() => this._session?.zoomBy(1 / step())),
+            'toggle-lock': guarded(() => this._session?.toggleLock()),
+            'unlock-all': guarded(() => this._session?.unlockAll()),
+        };
     }
 
     _toggle() {
