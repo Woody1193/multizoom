@@ -97,3 +97,15 @@ eq(s.zoom, 16, 'zoomTo clamps');
     ok(!V.followsFocus(st), 'locked view ignores focus');
     ok(!V.followsFocus(V.newState(m, 1)), 'view at 1x ignores focus');
 }
+
+// followPoint with a point past the monitor (the pointer just left it):
+// the view is pinned to the edge it crossed.
+{
+    const m = {x: 0, y: 0, width: 100, height: 100};
+    const st = V.newState(m, 2);
+
+    V.followPoint(st, m, 40, 40);
+    V.followPoint(st, m, 130, 40);
+    eq(st.viewX, 50, 'leaving right pins the view to the right edge');
+    eq(st.viewY, 20, 'leaving right keeps following y');
+}
