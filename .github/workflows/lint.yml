@@ -17,7 +17,7 @@ jobs:
     # 22.04 matches the target platform (GNOME Shell 42 / GJS 1.72).
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
