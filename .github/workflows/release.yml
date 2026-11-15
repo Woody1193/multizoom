@@ -1,10 +1,20 @@
 name: release
 
-# Push a tag like v1.2.3 to publish: the .deb and zip go on a GitHub release,
-# and the .deb into the signed apt repository served by GitHub Pages.
+# Publish a version: the .deb and zip go on its GitHub release (created, or
+# added to one made on the website), and the .deb into the signed apt
+# repository served by GitHub Pages. Runs when a tag like v1.2.3 is pushed or
+# a release is published on the website, or by hand for an existing tag.
 on:
   push:
     tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to publish, e.g. v1.2.3
+        required: true
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 permissions:
   contents: read
@@ -20,6 +30,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
 
       - name: Install tools
         run: |
@@ -30,7 +42,7 @@ jobs:
         run: make test
 
       - name: Build package
-        run: make deb VERSION="${GITHUB_REF_NAME#v}"
+        run: make deb VERSION="${TAG#v}"
 
       - name: Install package
         run: sudo apt-get install -y ./dist/*.deb
@@ -40,10 +52,15 @@ jobs:
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
         run: packaging/build-apt-repo.sh dist/*.deb site
 
-      - name: Create GitHub release
+      - name: Attach to GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/*.deb dist/*.zip --generate-notes
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.deb dist/*.zip --clobber
+          else
+            gh release create "$TAG" dist/*.deb dist/*.zip --generate-notes
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:

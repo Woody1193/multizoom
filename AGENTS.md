@@ -128,7 +128,9 @@ These are enforced by review, and by lint wherever a tool can measure them. When
 
 ## Releases
 
-- Push a tag `vX.Y.Z` on `main`. `release.yml` tests, builds the `.deb` (version `X.Y.Z`), attaches it and the zip to a GitHub release, and publishes the apt repository to GitHub Pages.
+- Push a tag `vX.Y.Z` on `main`, or publish a release on the website (which creates the tag). `release.yml` tests, builds the `.deb` (version `X.Y.Z`), attaches it and the zip to a GitHub release, and publishes the apt repository to GitHub Pages.
+- To redo a release for an existing tag, run `release.yml` by hand from `main` with that tag (`gh workflow run release.yml -f tag=vX.Y.Z`). Files on the release are replaced.
+- The `github-pages` environment must allow deploys from `v*` tags as well as `main`.
 - The repository is signed with the `APT_SIGNING_KEY` secret (an ASCII-armoured private key). Changing the key breaks `apt update` for every user until they fetch the new public key.
 
 ## Git workflow
