@@ -1,20 +1,9 @@
 'use strict';
-// Run with: gjs tests/viewport.test.js   (from the repo root, or via `make test`)
 
-const {GLib} = imports.gi;
-const here = GLib.path_get_dirname(GLib.canonicalize_filename(imports.system.programPath ?? 'tests/viewport.test.js', null));
-imports.searchPath.unshift(GLib.build_filenamev([here, '..']));
+// Tests for lib/viewport.js. Run all tests with `make test`.
+
 const V = imports.lib.viewport;
-
-let failures = 0;
-let count = 0;
-function eq(actual, expected, name) {
-    count++;
-    if (Math.abs(actual - expected) > 1e-9) {
-        failures++;
-        print(`FAIL ${name}: expected ${expected}, got ${actual}`);
-    }
-}
+const {eq} = imports.tests.harness;
 
 // Two side-by-side monitors: left 2560x1080, right 1920x1080.
 const left = {x: 0, y: 0, width: 2560, height: 1080};
@@ -28,6 +17,7 @@ eq(V.clampZoom(2.5), 2.5, 'clampZoom mid');
 
 // trackPointer: corners and centre map onto the monitor's own area only.
 let s = V.newState(right, 2);
+
 V.trackPointer(s, right, right.x, right.y);
 eq(s.viewX, right.x, 'pointer top-left → viewX');
 eq(s.viewY, right.y, 'pointer top-left → viewY');
@@ -36,10 +26,13 @@ eq(s.viewX, right.x + right.width / 2, 'pointer bottom-right → viewX');
 eq(s.viewY, right.y + right.height / 2, 'pointer bottom-right → viewY');
 V.trackPointer(s, right, right.x + right.width / 2, right.y + right.height / 2);
 eq(s.viewX, right.x + right.width / 4, 'pointer centre → viewX');
+
 // The pointer's drawn position equals its real position relative to the monitor.
 const drawnX = (right.x + 700 - (right.x + 700 * 0.5)) * 2;
+
 V.trackPointer(s, right, right.x + 700, 0);
 eq((right.x + 700 - s.viewX) * s.zoom, drawnX, 'proportional keeps cursor at same monitor position');
+
 // Pointer outside the monitor is clamped, never showing the neighbour.
 V.trackPointer(s, right, 0, 0);
 eq(s.viewX, right.x, 'pointer left of monitor clamps');
@@ -77,7 +70,3 @@ eq(s.viewX, 0, 'setZoom at 1 shows whole monitor');
 eq(V.monitorIndexAt(monitors, 10, 10), 0, 'monitorIndexAt left');
 eq(V.monitorIndexAt(monitors, 2560, 10), 1, 'monitorIndexAt right edge belongs to right');
 eq(V.monitorIndexAt(monitors, 4480, 10), -1, 'monitorIndexAt off-screen');
-
-print(`${count - failures}/${count} passed`);
-if (failures > 0)
-    imports.system.exit(1);

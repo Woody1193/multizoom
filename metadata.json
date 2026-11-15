@@ -1,0 +1,9 @@
+{
+  "uuid": "multizoom@woody1193.github.io",
+  "name": "MultiZoom",
+  "description": "Screen zoom that treats each monitor separately. Only the monitor with the pointer follows it; the others keep their view.",
+  "shell-version": ["42"],
+  "url": "https://github.com/Woody1193/multizoom",
+  "settings-schema": "org.gnome.shell.extensions.multizoom",
+  "version": 1
+}

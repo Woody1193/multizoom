@@ -24,11 +24,14 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 
 | Path | Purpose |
 | --- | --- |
-| `extension.js` | Entry point: `init`/`enable`/`disable`, keybindings, wiring, fail-safe. |
-| `lib/viewport.js` | Pure geometry (tracking, centring, clamping). **No `gi` imports**: it must run under plain `gjs` for the tests. |
-| `lib/*.js` | One concern per file (monitor view actors, cursor, pointer source, focus tracking). |
+| `extension.js` | Composition root: settings, keybindings, fail-safe, switching zoom on and off. No zoom logic of its own. |
+| `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`. |
+| `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
+| `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
+| `lib/safety.js` | `safely` (cleanup steps) and `guard` (entry points). |
+| `lib/viewport.js`, `lib/monitorStates.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
 | `schemas/*.gschema.xml` | GSettings: shortcuts and preferences. |
-| `tests/` | Unit tests, run with plain `gjs`. |
+| `tests/` | `run.js` runs every `*Test.js`; `harness.js` has the shared assertions. |
 | `metadata.json` | Extension metadata; `shell-version` must list every version actually tested. |
 
 ## Commands
@@ -55,12 +58,25 @@ make pack             # build an installable zip in dist/
 Automated gates are how this project keeps its baseline. They are not optional.
 
 - **Never bypass hooks.** Don't use `git commit --no-verify` or `SKIP=` locally. If a hook is wrong, fix the hook in its own commit.
+- **No duplication.** jscpd fails the commit on any repeated block of 5 lines / 40 tokens or more (`.jscpd.json`). Extract the shared code; don't raise the threshold.
 - **Zero lint warnings.** Fix the code, not the rule. An `eslint-disable` comment needs a one-line reason on the same line and must name the specific rule.
 - **CI must be green before merge:**
   - `lint.yml` runs every pre-commit hook except the unit tests;
   - `test.yml` runs the unit tests on Ubuntu 22.04's GJS.
 - **Test what can be tested.** Logic that can live in a pure function belongs in `lib/viewport.js` (or another `gi`-free module) with unit tests. Every bug fix in pure logic comes with a test that failed before the fix.
 - **Manual verification is still required** for anything touching actors, input or teardown. Describe what you checked in the pull request.
+
+## Engineering principles
+
+These are enforced by review, and by lint wherever a tool can measure them. When a lint limit trips, treat it as a design signal: split the code, don't disable the rule.
+
+- **Single responsibility (SRP).** Each file and class has one job you can state in a sentence, ideally its header comment. Lint backs this with size limits: files ≤ 250 lines, functions ≤ 40 lines and ≤ 15 statements, ≤ 4 parameters, nesting ≤ 3, complexity ≤ 8, cognitive complexity ≤ 10, one class per file.
+- **Don't repeat yourself (DRY).** One source of truth for every rule, constant and helper. Shared helpers live in `lib/` (e.g. `lib/safety.js`), and shared test code in `tests/harness.js`. Enforced by jscpd plus SonarJS (`no-identical-functions`, `no-duplicate-string`, identical branches and conditions).
+- **Pure core, thin shell.** Decisions (geometry, state rules) are pure functions or classes with injected dependencies and unit tests. GNOME-facing code only translates between those and actors, signals and settings.
+- **Explicit lifetimes.** An object that acquires something in its constructor releases it in `destroy()`. A constructor that fails part way undoes its own work before rethrowing (see `ZoomSession`).
+- **Composition root.** `extension.js` creates and connects objects; it doesn't implement features. New behaviour goes in a new or existing `lib/` module.
+- **Keep it simple (KISS, YAGNI).** Build what the current step needs. No speculative options, abstractions or settings without a user-facing reason.
+- **Name your values.** No magic numbers (lint: `no-magic-numbers`, except -1, 0, 1 and 2); settings keys and other repeated strings go in named constants.
 
 ## Code rules
 
@@ -97,7 +113,13 @@ Automated gates are how this project keeps its baseline. They are not optional.
 
 ### Style
 
-- ESLint enforces the style (GNOME Shell conventions: 4-space indent, single quotes, no spaces inside braces). `.editorconfig` covers the rest.
+- ESLint enforces the style: GNOME Shell conventions (4-space indent, single quotes, no spaces inside braces) plus the block layout below. `.editorconfig` covers the rest.
+- **Code is split into blocks** separated by blank lines (lint-enforced):
+  - a blank line before every comment, except at the start of a block, class, object or array;
+  - a blank line before and after every block statement (`if`, loops, `try`, `switch`) and after every multi-line statement;
+  - a blank line after declarations, and before `return`;
+  - no blank lines at the start or end of a block.
+- Group statements that belong together into one block, and put a short comment on top when the block's purpose isn't obvious.
 - Comments explain *why*, not *what*. Name units (screen pixels vs view pixels, µs vs ms) in names or comments.
 
 ## Git workflow

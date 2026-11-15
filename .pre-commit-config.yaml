@@ -44,6 +44,14 @@ repos:
         language: system
         files: \.(js|mjs)$
 
+      - id: jscpd
+        name: copy-paste detection (DRY)
+        description: Fails on any duplicated block of 5+ lines / 40+ tokens (see .jscpd.json)
+        entry: npx --no-install jscpd .
+        language: system
+        files: \.(js|mjs)$
+        pass_filenames: false
+
       - id: gsettings-schemas
         name: validate GSettings schemas
         entry: glib-compile-schemas --strict --dry-run schemas
