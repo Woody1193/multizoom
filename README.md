@@ -13,7 +13,7 @@ Works on GNOME Shell 42 (Ubuntu and Pop!_OS 22.04), tested on X11.
 - **Edge-to-edge tracking.** The pointer's position across the monitor matches its position across the view, so every edge and corner is reachable. Moving off a monitor quickly still leaves that monitor showing the edge you crossed.
 - **Follows keyboard focus and the text cursor.** Once the pointer has been still for a quarter of a second, a monitor's view follows Tab focus and typing on it, so what you're working on stays in view. It uses the same edge-to-edge mapping as the pointer, so clicking into text doesn't move the view. Works in GTK apps; Chrome and Electron apps only report focus with GNOME's `toolkit-accessibility` setting on.
 - **Lock a monitor.** A locked view stays put even while the pointer or focus is on that monitor, for example to keep a large dialog or a reference document in view. The pointer can move outside what you can see; clicks still land where the pointer really is.
-- **Remembers zoom levels.** Each monitor keeps its zoom level across zoom off and on, screen locks, restarts and monitor changes. A monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). Lock isn't remembered.
+- **Remembers zoom levels per physical monitor.** Each monitor keeps its zoom level across zoom off and on, screen locks and restarts. Monitors are recognised by the maker, model and serial number they report, so a monitor keeps its level wherever it's plugged in or placed. Moving between a desk and a conference room just works: the laptop screen and each external display or projector remember their own level. Monitors that report no serial (many laptop panels) are told apart by port. A monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). Lock isn't remembered.
 - **Readable feedback on screen.** A large badge in each monitor's top-right corner, drawn unzoomed, shows "Locked" while that view is locked and the new zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer (`Zoom 200%`), with a lock icon when that monitor is locked.
 - **Safe to rely on.** If MultiZoom hits an error, it switches itself off and turns on GNOME's built-in zoom, so you're never left unzoomed or without a cursor. Turning on GNOME's own zoom (Super+Alt+8) always switches MultiZoom off. When the screen locks while you're zoomed, GNOME's zoom stays on at the password prompt.
 - **Light on the desktop.** Pointer tracking does no allocation per movement, and the blocking accessibility lookups for focus only run when their result would be used (pointer resting, monitor unlocked and zoomed).
@@ -40,7 +40,7 @@ All settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
 | `zoom-step` | `0.25` | Amount added or removed by each zoom in or out (0.25 = 25%) |
 | `toggle-zoom`, `zoom-in`, `zoom-out`, `toggle-lock`, `unlock-all` | see Shortcuts | Shortcut for each action |
 | `active` | `false` | Whether zoom is on; kept across restarts |
-| `monitor-zooms` | `{}` | Saved zoom level per monitor; written by MultiZoom |
+| `monitor-zooms` | `{}` | Saved zoom level per physical monitor; written by MultiZoom |
 
 For example, to rebind lock:
 

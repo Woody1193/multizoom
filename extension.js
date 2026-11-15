@@ -9,6 +9,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Viewport = Me.imports.lib.viewport;
 const {BuiltinMagnifier} = Me.imports.lib.builtinMagnifier;
 const {Keybindings} = Me.imports.lib.keybindings;
+const {MonitorIds} = Me.imports.lib.monitorIds;
 const {MonitorStates} = Me.imports.lib.monitorStates;
 const {ZoomSession} = Me.imports.lib.zoomSession;
 const {guard, safely} = Me.imports.lib.safety;
@@ -35,6 +36,7 @@ class MultiZoom {
             (m, savedZoom) => Viewport.newState(m, savedZoom ?? zoom),
             this._zoomStore());
 
+        this._ids = new MonitorIds(() => this._session?.monitorIdsChanged(), this._onError);
         this._builtin = new BuiltinMagnifier(guard(() => this._stop(), this._onError));
 
         this._keybindings = new Keybindings(this._settings, this._shortcutActions());
@@ -54,7 +56,9 @@ class MultiZoom {
         safely(() => this._endSession());
         safely(() => this._keybindings.destroy());
         safely(() => this._builtin.release(keepZoomed));
+        safely(() => this._ids.destroy());
 
+        this._ids = null;
         this._keybindings = null;
         this._builtin = null;
         this._states = null;
@@ -95,7 +99,7 @@ class MultiZoom {
     _start() {
         this._builtin.takeOver();
         this._settings.set_boolean(ACTIVE_KEY, true);
-        this._session = new ZoomSession(this._states, this._onError);
+        this._session = new ZoomSession(this._states, m => this._ids.idOf(m), this._onError);
     }
 
     // Switch zoom off and remember that choice.
