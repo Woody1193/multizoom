@@ -32,7 +32,19 @@ Each zoom step adds or removes 25% (the `zoom-step` setting), so levels stay rou
 
 ## Settings
 
-All settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
+Open the settings window from the Extensions app, or run:
+
+```sh
+gnome-extensions prefs multizoom@woody1193.github.io
+```
+
+It works like GNOME Settings, and every change applies straight away:
+
+- **Zoom:** switch zoom on or off, and set the default magnification and the zoom step.
+- **Displays:** every display MultiZoom remembers, whether it's connected, and its magnification. Change a level, or forget a display so it starts at the default next time.
+- **Keyboard Shortcuts:** select a shortcut and press the new keys. Esc cancels and Backspace disables it. A combination already used by the desktop shows who has it and offers to replace it.
+
+Behind the window, all settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
 
 | Key | Default | Meaning |
 | --- | --- | --- |
@@ -40,7 +52,7 @@ All settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
 | `zoom-step` | `0.25` | Amount added or removed by each zoom in or out (0.25 = 25%) |
 | `toggle-zoom`, `zoom-in`, `zoom-out`, `toggle-lock`, `unlock-all` | see Shortcuts | Shortcut for each action |
 | `active` | `false` | Whether zoom is on; kept across restarts |
-| `monitor-zooms` | `{}` | Saved zoom level per physical monitor; written by MultiZoom |
+| `monitor-zooms` | `{}` | Saved zoom level per physical monitor |
 
 For example, to rebind lock:
 

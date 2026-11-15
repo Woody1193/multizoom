@@ -25,15 +25,13 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | Path | Purpose |
 | --- | --- |
 | `extension.js` | Composition root: settings, keybindings, fail-safe, switching zoom on and off. No zoom logic of its own. |
-| `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`, and routes pointer, focus and shortcuts to monitors in between. |
-| `lib/monitorSet.js` | The current monitors with their states and views, rebuilt when the layout changes. |
-| `lib/monitorIds.js`, `lib/monitorIdentity.js` | Which physical monitor (EDID vendor, product, serial) is where, from Mutter's DisplayConfig; the id rules are pure. |
-| `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
-| `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
-| `lib/focusWatch.js`, `lib/accessibleExtents.js` | Where keyboard focus and the text cursor are (AT-SPI), gated so blocking lookups only run when needed. |
-| `lib/viewBadge.js`, `lib/zoomIndicator.js` | Feedback: the badge inside each view; the top-panel indicator. |
-| `lib/safety.js` | `safely` (cleanup steps) and `guard` (entry points). |
-| `lib/viewport.js`, `lib/monitorStates.js`, `lib/monitorIdentity.js`, `lib/badgeText.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
+| `lib/zoom/` | The zoom itself. `zoomSession.js`: one period of zoom being on; takes over the screen in its constructor, gives it back in `destroy()`, and routes pointer, focus and shortcuts to monitors in between. `monitorSet.js`: the current monitors with their states and views. `viewport.js`: the view maths (pure). `builtinMagnifier.js`: hand-off with GNOME's own magnifier. |
+| `lib/monitors/` | Which monitor is which, and what it remembers. `monitorIds.js`: the physical monitor (EDID vendor, product, serial) at each place, from Mutter's DisplayConfig. `monitorIdentity.js`: the id rules (pure). `monitorStates.js`: zoom and lock per monitor, and saving levels (pure). `monitorLabel.js`: display names for saved monitors (pure). |
+| `lib/input/` | What to follow. `pointer.js`: the pointer source. `focusWatch.js`, `accessibleExtents.js`: keyboard focus and the text cursor (AT-SPI), gated so blocking lookups only run when needed. `keybindings.js`: the global shortcuts. |
+| `lib/ui/` | Everything MultiZoom draws. `monitorView.js`: one monitor's zoomed view. `cursor.js`: the drawn cursor. `viewBadge.js`: the badge inside each view. `zoomIndicator.js`: the top-panel indicator. `badgeText.js`: their wording (pure). |
+| `lib/common/` | Shared by everything. `safety.js`: `safely` (cleanup steps) and `guard` (entry points). `settingsKeys.js`: the settings key names, also used by the preferences window. |
+| `prefs.js`, `preferences/` | The preferences window (GTK 4, libadwaita). The folder must not be called `prefs/`: GNOME 42 would load it instead of `prefs.js`. Runs in its own process, never inside GNOME Shell: never import `Main`, `St`, `Shell` or `Meta` there. `shortcutConflicts.js` is pure. |
+| Pure modules (marked above) | **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
 | `schemas/*.gschema.xml` | GSettings: shortcuts and preferences. |
 | `tests/` | `run.js` runs every `*Test.js`; `harness.js` has the shared assertions. |
 | `metadata.json` | Extension metadata; `shell-version` must list every version actually tested. |
@@ -67,7 +65,7 @@ Automated gates are how this project keeps its baseline. They are not optional.
 - **CI must be green before merge:**
   - `lint.yml` runs every pre-commit hook except the unit tests;
   - `test.yml` runs the unit tests on Ubuntu 22.04's GJS.
-- **Test what can be tested.** Logic that can live in a pure function belongs in `lib/viewport.js` (or another `gi`-free module) with unit tests. Every bug fix in pure logic comes with a test that failed before the fix.
+- **Test what can be tested.** Logic that can live in a pure function belongs in `lib/zoom/viewport.js` (or another `gi`-free module) with unit tests. Every bug fix in pure logic comes with a test that failed before the fix.
 - **Manual verification is still required** for anything touching actors, input or teardown. Describe what you checked in the pull request.
 
 ## Engineering principles
@@ -75,7 +73,7 @@ Automated gates are how this project keeps its baseline. They are not optional.
 These are enforced by review, and by lint wherever a tool can measure them. When a lint limit trips, treat it as a design signal: split the code, don't disable the rule.
 
 - **Single responsibility (SRP).** Each file and class has one job you can state in a sentence, ideally its header comment. Lint backs this with size limits: files ≤ 250 lines, functions ≤ 40 lines and ≤ 15 statements, ≤ 4 parameters, nesting ≤ 3, complexity ≤ 8, cognitive complexity ≤ 10, one class per file.
-- **Don't repeat yourself (DRY).** One source of truth for every rule, constant and helper. Shared helpers live in `lib/` (e.g. `lib/safety.js`), and shared test code in `tests/harness.js`. Enforced by jscpd plus SonarJS (`no-identical-functions`, `no-duplicate-string`, identical branches and conditions).
+- **Don't repeat yourself (DRY).** One source of truth for every rule, constant and helper. Shared helpers live in `lib/` (e.g. `lib/common/safety.js`), and shared test code in `tests/harness.js`. Enforced by jscpd plus SonarJS (`no-identical-functions`, `no-duplicate-string`, identical branches and conditions).
 - **Pure core, thin shell.** Decisions (geometry, state rules) are pure functions or classes with injected dependencies and unit tests. GNOME-facing code only translates between those and actors, signals and settings.
 - **Explicit lifetimes.** An object that acquires something in its constructor releases it in `destroy()`. A constructor that fails part way undoes its own work before rethrowing (see `ZoomSession`).
 - **Composition root.** `extension.js` creates and connects objects; it doesn't implement features. New behaviour goes in a new or existing `lib/` module.

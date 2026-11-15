@@ -32,7 +32,7 @@ uninstall:
 ## Build an installable zip in dist/.
 pack:
 	mkdir -p dist
-	gnome-extensions pack --force --extra-source=lib --out-dir=dist .
+	gnome-extensions pack --force --extra-source=lib --extra-source=preferences --out-dir=dist .
 
 clean:
 	rm -rf dist schemas/gschemas.compiled

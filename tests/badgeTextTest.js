@@ -1,8 +1,8 @@
 'use strict';
 
-// Tests for lib/badgeText.js. Run all tests with `make test`.
+// Tests for lib/ui/badgeText.js. Run all tests with `make test`.
 
-const {badgeText} = imports.lib.badgeText;
+const {badgeText} = imports.lib.ui.badgeText;
 const {eq} = imports.tests.harness;
 
 eq(badgeText(false, null), '', 'nothing to show hides the badge');

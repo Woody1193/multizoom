@@ -1,8 +1,8 @@
 'use strict';
 
-// Tests for lib/monitorStates.js. Run all tests with `make test`.
+// Tests for lib/monitors/monitorStates.js. Run all tests with `make test`.
 
-const {MonitorStates} = imports.lib.monitorStates;
+const {MonitorStates} = imports.lib.monitors.monitorStates;
 const {eq, ok} = imports.tests.harness;
 
 const DEFAULT_ZOOM = 2;
@@ -142,4 +142,31 @@ const right = monitorAt(2560, 1920, 'edid:BOE:0x094a:eDP');
     states.get(left);
     states.saveZooms();
     ok(!(left.place in store.saved), 'and removed once the id is back');
+}
+
+// Levels changed in the preferences window reach the running states; our
+// own saves don't count as changes.
+{
+    const store = memoryStore({});
+    const states = new MonitorStates(createState, store);
+
+    const setZoom = (state, zoom) => {
+        state.zoom = zoom;
+    };
+
+    states.get(left).zoom = 3;
+    states.get(right);
+    states.saveZooms();
+    ok(!states.reload(setZoom), 'reloading our own save changes nothing');
+
+    store.saved = {...store.saved, [left.id]: 4};
+    ok(states.reload(setZoom), 'a level changed elsewhere is a change');
+    eq(states.get(left).zoom, 4, 'and is applied');
+
+    const forgotten = states.get(right);
+
+    store.saved = {[left.id]: 4};
+    ok(states.reload(setZoom), 'forgetting a monitor is a change');
+    ok(states.get(right) !== forgotten, 'a forgotten monitor gets a new state');
+    eq(states.get(right).zoom, DEFAULT_ZOOM, 'at the default zoom');
 }

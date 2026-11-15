@@ -1,8 +1,8 @@
 'use strict';
 
-// Tests for lib/viewport.js. Run all tests with `make test`.
+// Tests for lib/zoom/viewport.js. Run all tests with `make test`.
 
-const V = imports.lib.viewport;
+const V = imports.lib.zoom.viewport;
 const {eq, ok} = imports.tests.harness;
 
 // Two side-by-side monitors: left 2560x1080, right 1920x1080.
