@@ -23,6 +23,11 @@
       <summary>Zoom step</summary>
       <description>Amount each zoom-in or zoom-out shortcut adds to or removes from the zoom level (0.25 = 25%). Levels stay on multiples of it.</description>
     </key>
+    <key name="smooth-movement" type="b">
+      <default>true</default>
+      <summary>Smooth movement</summary>
+      <description>Glide to keyboard focus, the text cursor, new zoom levels and the pointer after unlocking, instead of jumping. Never when desktop animations are off.</description>
+    </key>
     <key name="toggle-zoom" type="as">
       <default><![CDATA[['<Super><Alt>z']]]></default>
       <summary>Turn zoom on or off</summary>
