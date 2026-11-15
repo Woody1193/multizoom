@@ -17,7 +17,11 @@ var ZoomPage = class ZoomPage {
 
         const group = new Adw.PreferencesGroup({title: 'Zoom'});
 
-        group.add(this._switchRow(settings));
+        group.add(this._switchRow(settings, Keys.ACTIVE, {
+            title: 'Zoom',
+            subtitle: 'Magnify each display on its own',
+        }));
+
         group.add(this._percentRow(settings, Keys.DEFAULT_ZOOM, {
             title: 'Default magnification',
             subtitle: 'For displays MultiZoom hasn\'t seen before',
@@ -28,21 +32,33 @@ var ZoomPage = class ZoomPage {
             subtitle: 'Added or removed by each zoom in or zoom out',
         }));
 
+        group.add(this._smoothRow(settings));
+
         this.page.add(group);
         this.page.add(new MonitorsGroup(settings).group);
     }
 
-    _switchRow(settings) {
+    // A row with a switch bound to a `b` key.
+    _switchRow(settings, key, text) {
         const toggle = new Gtk.Switch({valign: Gtk.Align.CENTER});
-
-        const row = new Adw.ActionRow({
-            title: 'Zoom',
-            subtitle: 'Magnify each display on its own',
-            activatable_widget: toggle,
-        });
+        const row = new Adw.ActionRow({...text, activatable_widget: toggle});
 
         row.add_suffix(toggle);
-        settings.bind(Keys.ACTIVE, toggle, 'active', Gio.SettingsBindFlags.DEFAULT);
+        settings.bind(key, toggle, 'active', Gio.SettingsBindFlags.DEFAULT);
+
+        return row;
+    }
+
+    // Greyed out while the desktop's own animations are off, as MultiZoom
+    // doesn't glide then either.
+    _smoothRow(settings) {
+        const row = this._switchRow(settings, Keys.SMOOTH_MOVEMENT, {
+            title: 'Smooth movement',
+            subtitle: 'Glide to keyboard focus, the text cursor and new zoom levels',
+        });
+
+        this._interface = new Gio.Settings({schema_id: Keys.INTERFACE_SCHEMA});
+        this._interface.bind(Keys.ENABLE_ANIMATIONS, row, 'sensitive', Gio.SettingsBindFlags.GET);
 
         return row;
     }

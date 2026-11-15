@@ -1,7 +1,7 @@
 'use strict';
 /* exported init */
 
-const {GLib} = imports.gi;
+const {GLib, St} = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -71,6 +71,12 @@ class MultiZoom {
         };
     }
 
+    // Whether views may glide: the user's choice, and never while the
+    // desktop's own animations are off.
+    _smooth() {
+        return this._settings.get_boolean(Keys.SMOOTH_MOVEMENT) && St.Settings.get().enable_animations;
+    }
+
     // Read when a monitor is first seen, so a new default applies at once.
     _defaultZoom() {
         return this._settings.get_double(Keys.DEFAULT_ZOOM);
@@ -136,7 +142,7 @@ class MultiZoom {
     // Switch zoom on and remember that choice.
     _start() {
         this._builtin.takeOver();
-        this._session = new ZoomSession(this._states, m => this._ids.idOf(m), this._onError);
+        this._session = new ZoomSession(this._states, m => this._ids.idOf(m), () => this._smooth(), this._onError);
         this._settings.set_boolean(Keys.ACTIVE, true);
     }
 
