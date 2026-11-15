@@ -39,11 +39,15 @@ class MultiZoom {
     }
 
     disable() {
-        const wasZooming = this._session !== null;
+        // GNOME disables extensions when the screen locks; the session is
+        // already in lock-screen mode by then. Keep a zooming user zoomed at
+        // the password prompt with the built-in magnifier. When the user
+        // disables MultiZoom themselves, leave zoom off.
+        const keepZoomed = this._session !== null && Main.sessionMode.isLocked;
 
         safely(() => this._endSession());
         safely(() => Main.wm.removeKeybinding(TOGGLE_ZOOM_KEY));
-        safely(() => this._builtin.release(wasZooming));
+        safely(() => this._builtin.release(keepZoomed));
 
         this._builtin = null;
         this._states = null;
