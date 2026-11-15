@@ -42,7 +42,7 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 ```sh
 npm ci                # install linters (once, and after package.json changes)
 pre-commit install    # enable the git hooks (once per clone)
-make test             # unit tests
+make test             # unit tests, then 100% line+function coverage of logic files
 npm run lint          # ESLint, zero warnings allowed
 pre-commit run --all-files   # every gate CI runs
 make install          # symlink into ~/.local/share/gnome-shell/extensions and compile schemas
@@ -67,6 +67,7 @@ Automated gates are how this project keeps its baseline. They are not optional.
 - **CI must be green before merge:**
   - `lint.yml` runs every pre-commit hook except the unit tests;
   - `test.yml` runs the unit tests on Ubuntu 22.04's GJS, and builds and installs the `.deb`.
+- **100% coverage of logic files.** `make test` (pre-commit and CI) fails unless every line and function of every logic file is covered. Logic files are found automatically: any `.js` under `lib/` or `preferences/` that imports nothing from `gi`, `ui` or `misc` (`tests/coverage.js`). Branches are reported but not enforced, because GJS 1.72 counts unreachable engine checks (destructuring, spread) as branches; still cover every real branch.
 - **Test what can be tested.** Logic that can live in a pure function belongs in `lib/zoom/viewport.js` (or another `gi`-free module) with unit tests. Every bug fix in pure logic comes with a test that failed before the fix.
 - **Manual verification is still required** for anything touching actors, input or teardown. Describe what you checked in the pull request.
 

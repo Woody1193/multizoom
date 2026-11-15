@@ -13,9 +13,15 @@ DEB       := dist/$(PACKAGE)_$(VERSION)_all.deb
 
 all: schemas
 
-## Run the unit tests (pure logic only; runs under plain gjs).
+## Run the unit tests (plain gjs) and require 100% line and function
+## coverage of every logic file (see tests/coverage.js).
+COVERAGE_DIR := dist/coverage
+
 test:
-	gjs tests/run.js
+	rm -rf $(COVERAGE_DIR)
+	gjs --coverage-prefix=$(CURDIR)/lib --coverage-prefix=$(CURDIR)/preferences \
+		--coverage-output=$(COVERAGE_DIR) tests/run.js
+	gjs tests/coverage.js $(COVERAGE_DIR)/coverage.lcov
 
 ## Run ESLint with zero warnings allowed.
 lint:
