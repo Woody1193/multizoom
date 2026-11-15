@@ -27,12 +27,13 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | `extension.js` | Composition root: settings, keybindings, fail-safe, switching zoom on and off. No zoom logic of its own. |
 | `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`, and routes pointer, focus and shortcuts to monitors in between. |
 | `lib/monitorSet.js` | The current monitors with their states and views, rebuilt when the layout changes. |
+| `lib/monitorIds.js`, `lib/monitorIdentity.js` | Which physical monitor (EDID vendor, product, serial) is where, from Mutter's DisplayConfig; the id rules are pure. |
 | `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
 | `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
 | `lib/focusWatch.js`, `lib/accessibleExtents.js` | Where keyboard focus and the text cursor are (AT-SPI), gated so blocking lookups only run when needed. |
 | `lib/viewBadge.js`, `lib/zoomIndicator.js` | Feedback: the badge inside each view; the top-panel indicator. |
 | `lib/safety.js` | `safely` (cleanup steps) and `guard` (entry points). |
-| `lib/viewport.js`, `lib/monitorStates.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
+| `lib/viewport.js`, `lib/monitorStates.js`, `lib/monitorIdentity.js`, `lib/badgeText.js` | Pure logic. **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
 | `schemas/*.gschema.xml` | GSettings: shortcuts and preferences. |
 | `tests/` | `run.js` runs every `*Test.js`; `harness.js` has the shared assertions. |
 | `metadata.json` | Extension metadata; `shell-version` must list every version actually tested. |
