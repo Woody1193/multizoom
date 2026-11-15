@@ -1,6 +1,7 @@
 'use strict';
 /* exported init */
 
+const {GLib} = imports.gi;
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -15,6 +16,8 @@ const {guard, safely} = Me.imports.lib.safety;
 const ACTIVE_KEY = 'active';
 const DEFAULT_ZOOM_KEY = 'default-zoom';
 const ZOOM_STEP_KEY = 'zoom-step';
+const MONITOR_ZOOMS_KEY = 'monitor-zooms';
+const MONITOR_ZOOMS_TYPE = 'a{sd}';
 
 // Composition root: owns the settings, the keyboard shortcut and the
 // fail-safe, and switches zoom on and off. The zooming itself is ZoomSession.
@@ -26,7 +29,10 @@ class MultiZoom {
 
         const zoom = this._settings.get_double(DEFAULT_ZOOM_KEY);
 
-        this._states = new MonitorStates(m => Viewport.newState(m, zoom));
+        this._states = new MonitorStates(
+            (m, savedZoom) => Viewport.newState(m, savedZoom ?? zoom),
+            this._zoomStore());
+
         this._builtin = new BuiltinMagnifier(guard(() => this._stop(), this._onError));
 
         this._keybindings = new Keybindings(this._settings, this._shortcutActions());
@@ -51,6 +57,14 @@ class MultiZoom {
         this._builtin = null;
         this._states = null;
         this._settings = null;
+    }
+
+    // Where MonitorStates saves each monitor's zoom level.
+    _zoomStore() {
+        return {
+            load: () => this._settings.get_value(MONITOR_ZOOMS_KEY).deep_unpack(),
+            save: zooms => this._settings.set_value(MONITOR_ZOOMS_KEY, new GLib.Variant(MONITOR_ZOOMS_TYPE, zooms)),
+        };
     }
 
     // Handlers for each shortcut, keyed by its settings key. Everything but

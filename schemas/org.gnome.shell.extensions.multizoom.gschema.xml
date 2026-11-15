@@ -12,6 +12,11 @@
       <summary>Starting zoom for a monitor</summary>
       <description>Zoom level a monitor gets the first time MultiZoom sees it.</description>
     </key>
+    <key name="monitor-zooms" type="a{sd}">
+      <default>{}</default>
+      <summary>Saved zoom level per monitor</summary>
+      <description>Written by MultiZoom when a monitor's zoom changes. Keys are monitor geometry, "x,y,widthxheight".</description>
+    </key>
     <key name="zoom-step" type="d">
       <range min="1.05" max="4.0"/>
       <default>1.25</default>

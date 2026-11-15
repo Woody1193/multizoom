@@ -109,3 +109,16 @@ eq(s.zoom, 16, 'zoomTo clamps');
     eq(st.viewX, 50, 'leaving right pins the view to the right edge');
     eq(st.viewY, 20, 'leaving right keeps following y');
 }
+
+// clampZoom rounds away floating-point drift. Zooming out multiplies by
+// 1 / 1.25, which isn't exact in binary: out, out, in, in from 2 used to
+// give 2.0000000000000009.
+{
+    const STEP = 1.25;
+    let z = 2;
+
+    for (const factor of [1 / STEP, 1 / STEP, STEP, STEP])
+        z = V.clampZoom(z * factor);
+
+    ok(z === 2, 'out, out, in, in returns exactly to 2');
+}

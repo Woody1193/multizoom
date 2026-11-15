@@ -12,7 +12,7 @@ Linux zoom utility that doesn't suck
 | Super+Alt+K | Lock or unlock the view on the monitor under the pointer |
 | Super+Alt+Shift+K | Unlock every monitor |
 
-Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). A badge in the monitor's top-right corner shows "Locked" while that view is locked, and the zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer, with a lock icon when that monitor is locked.
+Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). Each monitor remembers its own zoom level, including across screen locks and restarts; a monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). A badge in the monitor's top-right corner shows "Locked" while that view is locked, and the zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer, with a lock icon when that monitor is locked.
 
 When the pointer is still, a monitor's view also follows the keyboard focus and the text cursor on it, so typing and Tab keep what you're working on in view. Locked monitors and monitors at 100% ignore focus.
 
