@@ -2,6 +2,22 @@
 
 Linux zoom utility that doesn't suck
 
+MultiZoom is a screen magnifier for GNOME Shell that zooms each monitor on its own. GNOME's built-in zoom treats all monitors as one big screen, so half of what you're looking at ends up on the next monitor. MultiZoom gives every monitor its own zoomed view.
+
+Works on GNOME Shell 42 (Ubuntu and Pop!_OS 22.04), tested on X11.
+
+## Features
+
+- **Per-monitor zoom.** Each monitor has its own zoom level, from 100% to 1600%, changed with the shortcuts below.
+- **Only the active monitor moves.** The monitor under the pointer follows it; the other monitors keep their view.
+- **Edge-to-edge tracking.** The pointer's position across the monitor matches its position across the view, so every edge and corner is reachable. Moving off a monitor quickly still leaves that monitor showing the edge you crossed.
+- **Follows keyboard focus and the text cursor.** Once the pointer has been still for a quarter of a second, a monitor's view follows Tab focus and typing on it, so what you're working on stays in view. It uses the same edge-to-edge mapping as the pointer, so clicking into text doesn't move the view. Works in GTK apps; Chrome and Electron apps only report focus with GNOME's `toolkit-accessibility` setting on.
+- **Lock a monitor.** A locked view stays put even while the pointer or focus is on that monitor, for example to keep a large dialog or a reference document in view. The pointer can move outside what you can see; clicks still land where the pointer really is.
+- **Remembers zoom levels.** Each monitor keeps its zoom level across zoom off and on, screen locks, restarts and monitor changes. A monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). Lock isn't remembered.
+- **Readable feedback on screen.** A large badge in each monitor's top-right corner, drawn unzoomed, shows "Locked" while that view is locked and the new zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer (`Zoom 200%`), with a lock icon when that monitor is locked.
+- **Safe to rely on.** If MultiZoom hits an error, it switches itself off and turns on GNOME's built-in zoom, so you're never left unzoomed or without a cursor. Turning on GNOME's own zoom (Super+Alt+8) always switches MultiZoom off. When the screen locks while you're zoomed, GNOME's zoom stays on at the password prompt.
+- **Light on the desktop.** Pointer tracking does no allocation per movement, and the blocking accessibility lookups for focus only run when their result would be used (pointer resting, monitor unlocked and zoomed).
+
 ## Shortcuts
 
 | Shortcut | Action |
@@ -12,20 +28,42 @@ Linux zoom utility that doesn't suck
 | Super+Alt+K | Lock or unlock the view on the monitor under the pointer |
 | Super+Alt+Shift+K | Unlock every monitor |
 
-Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). Each monitor remembers its own zoom level, including across screen locks and restarts; a monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). A badge in the monitor's top-right corner shows "Locked" while that view is locked, and the zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer, with a lock icon when that monitor is locked.
+Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). Zoom in, zoom out and lock act on a running zoom only.
 
-When the pointer is still, a monitor's view also follows the keyboard focus and the text cursor on it, so typing and Tab keep what you're working on in view. Locked monitors and monitors at 100% ignore focus.
+## Settings
 
-A locked view stays put even while the pointer is on its monitor, so the pointer can move outside what you can see. Clicks still land where the pointer really is.
+All settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
 
-Shortcuts are GSettings keys, so they can be rebound, for example:
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `default-zoom` | `2.0` | Zoom level for a monitor seen for the first time |
+| `zoom-step` | `1.25` | Factor for each zoom in or out |
+| `toggle-zoom`, `zoom-in`, `zoom-out`, `toggle-lock`, `unlock-all` | see Shortcuts | Shortcut for each action |
+| `active` | `false` | Whether zoom is on; kept across restarts |
+| `monitor-zooms` | `{}` | Saved zoom level per monitor; written by MultiZoom |
+
+For example, to rebind lock:
 
 ```sh
 gsettings --schemadir ~/.local/share/gnome-shell/extensions/multizoom@woody1193.github.io/schemas \
     set org.gnome.shell.extensions.multizoom toggle-lock "['<Super><Alt>l']"
 ```
 
-Turning on GNOME's own zoom (Super+Alt+8) always switches MultiZoom off.
+## Install
+
+From a clone of this repository:
+
+```sh
+make install   # symlinks into ~/.local/share/gnome-shell/extensions and compiles the settings schema
+```
+
+Then restart GNOME Shell (on X11: Alt+F2, type `r`, Enter; on Wayland: log out and back in) and enable it:
+
+```sh
+gnome-extensions enable multizoom@woody1193.github.io
+```
+
+Press Super+Alt+Z to start zooming. `make uninstall` removes it.
 
 ## Development
 
