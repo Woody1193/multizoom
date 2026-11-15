@@ -32,6 +32,7 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | `lib/common/` | Shared by everything. `safety.js`: `safely` (cleanup steps) and `guard` (entry points). `settingsKeys.js`: the settings key names, also used by the preferences window. |
 | `prefs.js`, `preferences/` | The preferences window (GTK 4, libadwaita). The folder must not be called `prefs/`: GNOME 42 would load it instead of `prefs.js`. Runs in its own process, never inside GNOME Shell: never import `Main`, `St`, `Shell` or `Meta` there. `shortcutConflicts.js` is pure. |
 | Pure modules (marked above) | **No `gi` imports and no module imports** (inject dependencies instead), so they run under plain `gjs` for the tests. |
+| `packaging/` | The Debian package: `control.in` (filled in by `make deb`) and `build-apt-repo.sh` (the signed apt repository the release workflow publishes). |
 | `schemas/*.gschema.xml` | GSettings: shortcuts and preferences. |
 | `tests/` | `run.js` runs every `*Test.js`; `harness.js` has the shared assertions. |
 | `metadata.json` | Extension metadata; `shell-version` must list every version actually tested. |
@@ -46,6 +47,7 @@ npm run lint          # ESLint, zero warnings allowed
 pre-commit run --all-files   # every gate CI runs
 make install          # symlink into ~/.local/share/gnome-shell/extensions and compile schemas
 make pack             # build an installable zip in dist/
+make deb              # build a .deb in dist/ from the same files
 ```
 
 **Dev loop:**
@@ -64,7 +66,7 @@ Automated gates are how this project keeps its baseline. They are not optional.
 - **Zero lint warnings.** Fix the code, not the rule. An `eslint-disable` comment needs a one-line reason on the same line and must name the specific rule.
 - **CI must be green before merge:**
   - `lint.yml` runs every pre-commit hook except the unit tests;
-  - `test.yml` runs the unit tests on Ubuntu 22.04's GJS.
+  - `test.yml` runs the unit tests on Ubuntu 22.04's GJS, and builds and installs the `.deb`.
 - **Test what can be tested.** Logic that can live in a pure function belongs in `lib/zoom/viewport.js` (or another `gi`-free module) with unit tests. Every bug fix in pure logic comes with a test that failed before the fix.
 - **Manual verification is still required** for anything touching actors, input or teardown. Describe what you checked in the pull request.
 
@@ -123,6 +125,11 @@ These are enforced by review, and by lint wherever a tool can measure them. When
   - no blank lines at the start or end of a block.
 - Group statements that belong together into one block, and put a short comment on top when the block's purpose isn't obvious.
 - Comments explain *why*, not *what*. Name units (screen pixels vs view pixels, µs vs ms) in names or comments.
+
+## Releases
+
+- Push a tag `vX.Y.Z` on `main`. `release.yml` tests, builds the `.deb` (version `X.Y.Z`), attaches it and the zip to a GitHub release, and publishes the apt repository to GitHub Pages.
+- The repository is signed with the `APT_SIGNING_KEY` secret (an ASCII-armoured private key). Changing the key breaks `apt update` for every user until they fetch the new public key.
 
 ## Git workflow
 
