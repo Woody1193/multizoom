@@ -25,7 +25,8 @@ People rely on this to see their screen. A bug here is not cosmetic: it can leav
 | Path | Purpose |
 | --- | --- |
 | `extension.js` | Composition root: settings, keybindings, fail-safe, switching zoom on and off. No zoom logic of its own. |
-| `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`. |
+| `lib/zoomSession.js` | One period of zoom being on: takes over the screen in its constructor, gives it back in `destroy()`, and routes pointer, focus and shortcuts to monitors in between. |
+| `lib/monitorSet.js` | The current monitors with their states and views, rebuilt when the layout changes. |
 | `lib/builtinMagnifier.js` | Hand-off with GNOME's own magnifier. |
 | `lib/monitorView.js`, `lib/cursor.js`, `lib/pointer.js` | One monitor's zoomed view; the drawn cursor; the pointer source. |
 | `lib/focusWatch.js`, `lib/accessibleExtents.js` | Where keyboard focus and the text cursor are (AT-SPI), gated so blocking lookups only run when needed. |
