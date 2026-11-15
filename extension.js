@@ -16,6 +16,8 @@ const {guard, safely} = Me.imports.lib.safety;
 const ACTIVE_KEY = 'active';
 const DEFAULT_ZOOM_KEY = 'default-zoom';
 const ZOOM_STEP_KEY = 'zoom-step';
+const ZOOM_IN = 1;
+const ZOOM_OUT = -1;
 const MONITOR_ZOOMS_KEY = 'monitor-zooms';
 const MONITOR_ZOOMS_TYPE = 'a{sd}';
 
@@ -75,8 +77,8 @@ class MultiZoom {
 
         return {
             'toggle-zoom': guarded(() => this._toggle()),
-            'zoom-in': guarded(() => this._session?.zoomBy(step())),
-            'zoom-out': guarded(() => this._session?.zoomBy(1 / step())),
+            'zoom-in': guarded(() => this._session?.stepZoom(step(), ZOOM_IN)),
+            'zoom-out': guarded(() => this._session?.stepZoom(step(), ZOOM_OUT)),
             'toggle-lock': guarded(() => this._session?.toggleLock()),
             'unlock-all': guarded(() => this._session?.unlockAll()),
         };

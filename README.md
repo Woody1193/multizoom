@@ -28,7 +28,7 @@ Works on GNOME Shell 42 (Ubuntu and Pop!_OS 22.04), tested on X11.
 | Super+Alt+K | Lock or unlock the view on the monitor under the pointer |
 | Super+Alt+Shift+K | Unlock every monitor |
 
-Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). Zoom in, zoom out and lock act on a running zoom only.
+Each zoom step adds or removes 25% (the `zoom-step` setting), so levels stay round: 200%, 225%, 250%. Zoom in, zoom out and lock act on a running zoom only.
 
 ## Settings
 
@@ -37,7 +37,7 @@ All settings are GSettings keys in `org.gnome.shell.extensions.multizoom`:
 | Key | Default | Meaning |
 | --- | --- | --- |
 | `default-zoom` | `2.0` | Zoom level for a monitor seen for the first time |
-| `zoom-step` | `1.25` | Factor for each zoom in or out |
+| `zoom-step` | `0.25` | Amount added or removed by each zoom in or out (0.25 = 25%) |
 | `toggle-zoom`, `zoom-in`, `zoom-out`, `toggle-lock`, `unlock-all` | see Shortcuts | Shortcut for each action |
 | `active` | `false` | Whether zoom is on; kept across restarts |
 | `monitor-zooms` | `{}` | Saved zoom level per monitor; written by MultiZoom |
