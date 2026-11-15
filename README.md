@@ -14,6 +14,8 @@ Linux zoom utility that doesn't suck
 
 Each zoom step multiplies or divides the zoom by 1.25 (the `zoom-step` setting). A badge in the monitor's top-right corner shows "Locked" while that view is locked, and the zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer, with a lock icon when that monitor is locked.
 
+When the pointer is still, a monitor's view also follows the keyboard focus and the text cursor on it, so typing and Tab keep what you're working on in view. Locked monitors and monitors at 100% ignore focus.
+
 A locked view stays put even while the pointer is on its monitor, so the pointer can move outside what you can see. Clicks still land where the pointer really is.
 
 Shortcuts are GSettings keys, so they can be rebound, for example:
