@@ -8,7 +8,7 @@ all: schemas
 
 ## Run the unit tests (pure logic only; runs under plain gjs).
 test:
-	gjs tests/viewport.test.js
+	gjs tests/run.js
 
 ## Run ESLint with zero warnings allowed.
 lint:

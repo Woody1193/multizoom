@@ -1,0 +1,11 @@
+{
+  "threshold": 0,
+  "minTokens": 40,
+  "minLines": 5,
+  "format": ["javascript"],
+  "pattern": "**/*.{js,mjs}",
+  "ignore": ["node_modules/**", "dist/**"],
+  "gitignore": true,
+  "reporters": ["console"],
+  "absolute": false
+}

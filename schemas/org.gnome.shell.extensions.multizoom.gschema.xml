@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="multizoom">
+  <schema id="org.gnome.shell.extensions.multizoom" path="/org/gnome/shell/extensions/multizoom/">
+    <key name="active" type="b">
+      <default>false</default>
+      <summary>Zoom is on</summary>
+      <description>Remembered across restarts. Turned on automatically when MultiZoom takes over from the built-in magnifier.</description>
+    </key>
+    <key name="default-zoom" type="d">
+      <range min="1.0" max="16.0"/>
+      <default>2.0</default>
+      <summary>Starting zoom for a monitor</summary>
+      <description>Zoom level a monitor gets the first time MultiZoom sees it.</description>
+    </key>
+    <key name="toggle-zoom" type="as">
+      <default><![CDATA[['<Super><Alt>z']]]></default>
+      <summary>Turn zoom on or off</summary>
+    </key>
+  </schema>
+</schemalist>
