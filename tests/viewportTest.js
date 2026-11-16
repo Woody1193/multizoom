@@ -70,6 +70,9 @@ eq(s.viewX, 0, 'setZoom at 1 shows whole monitor');
 eq(V.monitorIndexAt(monitors, 10, 10), 0, 'monitorIndexAt left');
 eq(V.monitorIndexAt(monitors, 2560, 10), 1, 'monitorIndexAt right edge belongs to right');
 eq(V.monitorIndexAt(monitors, 4480, 10), -1, 'monitorIndexAt off-screen');
+eq(V.monitorIndexAt(monitors, -1, 10), -1, 'monitorIndexAt left of every monitor');
+eq(V.monitorIndexAt(monitors, 10, -1), -1, 'monitorIndexAt above every monitor');
+eq(V.monitorIndexAt(monitors, 10, 1440), -1, 'monitorIndexAt below every monitor');
 
 // zoomTo: unlocked follows the pointer, locked keeps its centre.
 s = V.newState(left, 2);
