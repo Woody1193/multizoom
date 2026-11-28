@@ -1,23 +1,25 @@
 'use strict';
 /* exported ZoomPage */
 
-const {Adw, Gio, Gtk} = imports.gi;
+const {Adw, Gio} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 const Keys = Me.imports.lib.common.settingsKeys;
+const {CrosshairsGroup} = Me.imports.preferences.crosshairsGroup;
 const {MonitorsGroup} = Me.imports.preferences.monitorsGroup;
 const {PercentRow} = Me.imports.preferences.percentRow;
 const {connectWhileAlive, schemaRange} = Me.imports.preferences.util;
+const {switchRow} = Me.imports.preferences.switchRow;
 
-// The "Zoom" page: on/off, default magnification, zoom step, and the
-// remembered displays.
+// The "Zoom" page: on/off, default magnification, zoom step, crosshairs
+// and the remembered displays.
 var ZoomPage = class ZoomPage {
     constructor(settings) {
         this.page = new Adw.PreferencesPage({title: 'Zoom', icon_name: 'zoom-in-symbolic'});
 
         const group = new Adw.PreferencesGroup({title: 'Zoom'});
 
-        group.add(this._switchRow(settings, Keys.ACTIVE, {
+        group.add(switchRow(settings, Keys.ACTIVE, {
             title: 'Zoom',
             subtitle: 'Magnify each display on its own',
         }));
@@ -35,24 +37,14 @@ var ZoomPage = class ZoomPage {
         group.add(this._smoothRow(settings));
 
         this.page.add(group);
+        this.page.add(new CrosshairsGroup(settings).group);
         this.page.add(new MonitorsGroup(settings).group);
-    }
-
-    // A row with a switch bound to a `b` key.
-    _switchRow(settings, key, text) {
-        const toggle = new Gtk.Switch({valign: Gtk.Align.CENTER});
-        const row = new Adw.ActionRow({...text, activatable_widget: toggle});
-
-        row.add_suffix(toggle);
-        settings.bind(key, toggle, 'active', Gio.SettingsBindFlags.DEFAULT);
-
-        return row;
     }
 
     // Greyed out while the desktop's own animations are off, as MultiZoom
     // doesn't glide then either.
     _smoothRow(settings) {
-        const row = this._switchRow(settings, Keys.SMOOTH_MOVEMENT, {
+        const row = switchRow(settings, Keys.SMOOTH_MOVEMENT, {
             title: 'Smooth movement',
             subtitle: 'Glide to keyboard focus, the text cursor and new zoom levels',
         });

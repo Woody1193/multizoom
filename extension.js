@@ -9,6 +9,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Keys = Me.imports.lib.common.settingsKeys;
 const Viewport = Me.imports.lib.zoom.viewport;
 const {BuiltinMagnifier} = Me.imports.lib.zoom.builtinMagnifier;
+const {CrosshairSettings} = Me.imports.lib.ui.crosshairSettings;
 const {Keybindings} = Me.imports.lib.input.keybindings;
 const {MonitorIds} = Me.imports.lib.monitors.monitorIds;
 const {MonitorStates} = Me.imports.lib.monitors.monitorStates;
@@ -24,6 +25,7 @@ const ZOOM_OUT = -1;
 class MultiZoom {
     enable() {
         this._settings = ExtensionUtils.getSettings();
+        this._crosshairSettings = new CrosshairSettings(this._settings);
         this._session = null;
         this._onError = e => this._fail(e);
 
@@ -59,6 +61,7 @@ class MultiZoom {
         this._keybindings = null;
         this._builtin = null;
         this._states = null;
+        this._crosshairSettings = null;
         this._settings = null;
     }
 
@@ -142,7 +145,12 @@ class MultiZoom {
     // Switch zoom on and remember that choice.
     _start() {
         this._builtin.takeOver();
-        this._session = new ZoomSession(this._states, m => this._ids.idOf(m), () => this._smooth(), this._onError);
+        this._session = new ZoomSession(this._states, m => this._ids.idOf(m), {
+            smooth: () => this._smooth(),
+            crosshairSettings: this._crosshairSettings,
+            onError: this._onError,
+        });
+
         this._settings.set_boolean(Keys.ACTIVE, true);
     }
 

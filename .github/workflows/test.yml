@@ -19,8 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install GJS
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gjs
+      # gsettings-desktop-schemas: settingsKeysTest checks names against GNOME's
+      # magnifier schema.
+      - name: Install GJS and GNOME's schemas
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gjs gsettings-desktop-schemas
 
       - name: Show GJS version
         run: gjs --version
