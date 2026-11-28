@@ -13,6 +13,7 @@ Works on GNOME Shell 42 (Ubuntu and Pop!_OS 22.04), tested on X11.
 - **Edge-to-edge tracking.** The pointer's position across the monitor matches its position across the view, so every edge and corner is reachable. Moving off a monitor quickly still leaves that monitor showing the edge you crossed.
 - **Follows keyboard focus and the text cursor.** Once the pointer has been still for a quarter of a second, a monitor's view follows Tab focus and typing on it, so what you're working on stays in view. It uses the same edge-to-edge mapping as the pointer, so clicking into text doesn't move the view. Works in GTK apps; Chrome and Electron apps only report focus with GNOME's `toolkit-accessibility` setting on.
 - **Smooth movement.** Jumps to keyboard focus and the text cursor, zooming in and out, and unlocking glide there in 150 ms instead of jumping, so you can see where the view went. Following the pointer stays instant. Turn it off in the settings window (`smooth-movement`); it's always off while GNOME's own animations are off.
+- **Crosshairs.** Lines through the pointer, drawn on the monitor it's on, to help find it: straight (+), diagonal (×) or both, with an optional circle around the pointer as a targeting reticle (or the circle alone). They use GNOME's own crosshair settings (on/off, colour, opacity, thickness, length, whether they overlap the pointer), so the choices in GNOME Settings → Accessibility → Zoom apply, and the settings window changes the same keys. On a locked monitor the lines still show when the pointer is outside the view, pointing at the row and column it's on.
 - **Lock a monitor.** A locked view stays put even while the pointer or focus is on that monitor, for example to keep a large dialog or a reference document in view. The pointer can move outside what you can see; clicks still land where the pointer really is.
 - **Remembers zoom levels per physical monitor.** Each monitor keeps its zoom level across zoom off and on, screen locks and restarts. Monitors are recognised by the maker, model and serial number they report, so a monitor keeps its level wherever it's plugged in or placed. Moving between a desk and a conference room just works: the laptop screen and each external display or projector remember their own level. Monitors that report no serial (many laptop panels) are told apart by port. A monitor MultiZoom hasn't seen before starts at 200% (`default-zoom`). Lock isn't remembered.
 - **Readable feedback on screen.** A large badge in each monitor's top-right corner, drawn unzoomed, shows "Locked" while that view is locked and the new zoom level for a moment after it changes. While zoom is on, the top panel shows the zoom level of the monitor under the pointer (`Zoom 200%`), with a lock icon when that monitor is locked.
@@ -42,6 +43,7 @@ gnome-extensions prefs multizoom@woody1193.github.io
 It works like GNOME Settings, and every change applies straight away:
 
 - **Zoom:** switch zoom on or off, set the default magnification and the zoom step, and turn smooth movement on or off.
+- **Crosshairs:** show them, choose the lines and the circle, and set whether they overlap the pointer, their thickness, length and colour. All but the lines and circle are GNOME's own magnifier settings (`org.gnome.desktop.a11y.magnifier`), shared with GNOME Settings.
 - **Displays:** every display MultiZoom remembers, whether it's connected, and its magnification. Change a level, or forget a display so it starts at the default next time.
 - **Keyboard Shortcuts:** select a shortcut and press the new keys. Esc cancels and Backspace disables it. A combination already used by the desktop shows who has it and offers to replace it.
 
@@ -52,6 +54,9 @@ Behind the window, all settings are GSettings keys in `org.gnome.shell.extension
 | `default-zoom` | `2.0` | Zoom level for a monitor seen for the first time |
 | `zoom-step` | `0.25` | Amount added or removed by each zoom in or out (0.25 = 25%) |
 | `smooth-movement` | `true` | Glide to focus, the text cursor, new zoom levels and the pointer after unlocking |
+| `crosshair-lines` | `'straight'` | Crosshair lines: `straight`, `diagonal`, `both` or `none` |
+| `crosshair-circle` | `false` | Draw a circle around the pointer with the crosshairs |
+| `crosshair-circle-radius` | `50` | The circle's radius in screen pixels (10 to 500) |
 | `toggle-zoom`, `zoom-in`, `zoom-out`, `toggle-lock`, `unlock-all` | see Shortcuts | Shortcut for each action |
 | `active` | `false` | Whether zoom is on; kept across restarts |
 | `monitor-zooms` | `{}` | Saved zoom level per physical monitor |

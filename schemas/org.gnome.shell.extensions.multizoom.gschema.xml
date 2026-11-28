@@ -28,6 +28,28 @@
       <summary>Smooth movement</summary>
       <description>Glide to keyboard focus, the text cursor, new zoom levels and the pointer after unlocking, instead of jumping. Never when desktop animations are off.</description>
     </key>
+    <key name="crosshair-lines" type="s">
+      <choices>
+        <choice value="straight"/>
+        <choice value="diagonal"/>
+        <choice value="both"/>
+        <choice value="none"/>
+      </choices>
+      <default>'straight'</default>
+      <summary>Crosshair lines</summary>
+      <description>Which lines the crosshairs draw through the pointer: straight (+), diagonal (×), both, or none (for a circle only). Their colour, thickness and length are GNOME's own crosshair settings.</description>
+    </key>
+    <key name="crosshair-circle" type="b">
+      <default>false</default>
+      <summary>Crosshair circle</summary>
+      <description>Draw a circle around the pointer as part of the crosshairs.</description>
+    </key>
+    <key name="crosshair-circle-radius" type="i">
+      <range min="10" max="500"/>
+      <default>50</default>
+      <summary>Crosshair circle radius</summary>
+      <description>Radius of the crosshair circle, in screen pixels.</description>
+    </key>
     <key name="toggle-zoom" type="as">
       <default><![CDATA[['<Super><Alt>z']]]></default>
       <summary>Turn zoom on or off</summary>

@@ -2,7 +2,7 @@
 
 // Tests for preferences/util.js, with stand-ins for GObjects and GSettings.
 
-const {PERCENT, connectWhileAlive, schemaRange} = imports.preferences.util;
+const {PERCENT, connectWhileAlive, hexColor, schemaRange} = imports.preferences.util;
 const {eq, ok} = imports.tests.harness;
 
 // A minimal signal emitter: connect, disconnect, emit.
@@ -56,3 +56,6 @@ eq(PERCENT, 100, 'factor 1 is 100%');
 
     eq(schemaRange(settings, 'zoom-step').join(), '0.05,4', 'reads [min, max] from the schema');
 }
+
+eq(hexColor({red: 1, green: 0, blue: 0}), '#ff0000', 'red as hex');
+eq(hexColor({red: 0.5, green: 0.0625, blue: 1}), '#8010ff', 'channels round and pad to two digits');
